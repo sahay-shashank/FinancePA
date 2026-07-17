@@ -5,8 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"FinancePA/app/core"
-	"FinancePA/app/utils"
+	"FinancePA/core/utils"
 )
 
 // TestParseFromCSV ensures parsing goes as expected by perfomring parsing over different flavours of CSV.
@@ -17,7 +16,7 @@ func TestParseFromCSV(t *testing.T) {
 		expectedRows int
 		expectedCols int
 		expectError  bool
-		expectedCode core.ErrorCode
+		expectedCode utils.ErrorCode
 	}{
 		{
 			name:         "Success: Valid standard financial statement records",
@@ -52,13 +51,13 @@ func TestParseFromCSV(t *testing.T) {
 					t.Fatalf("FAIL [%s]: Expected a parser engine crash, but received zero errors.", tt.name)
 				}
 
-				var appErr *core.AppError
+				var appErr *utils.AppError
 				if errors.As(err, &appErr) {
 					if appErr.Code != tt.expectedCode {
 						t.Errorf("FAIL [%s]: Error signature mismatch.\nExpected Code: %s\nActual Code:   %s", tt.name, tt.expectedCode, appErr.Code)
 					}
 				} else {
-					t.Errorf("FAIL [%s]: Error returned did not match our structured app/core.AppError type wrapper.", tt.name)
+					t.Errorf("FAIL [%s]: Error returned did not match our structured core/utils/AppError type wrapper.", tt.name)
 				}
 				return
 			}
