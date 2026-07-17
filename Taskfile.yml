@@ -1,0 +1,49 @@
+version: 3
+
+silent: true
+
+vars:
+  DIRS: ["Core"]
+
+tasks:
+  test:
+    desc: Run tests
+    summary: |
+      Run every tests listed under "test" directory
+    cmds:
+    - for:
+        var: DIRS
+      cmd: |
+        set -eou pipefail
+
+        cd {{.ITEM}}
+        go mod tidy
+        echo "[INFO] Testing test cases listed under \"test/\""
+        go test ./tests/... -v
+
+  coverage:
+    desc: Test coverage report
+    summary: |
+      Generate go test coverage report
+    cmds:
+    - for:
+        var: DIRS
+      cmd: |
+        set -eou pipefail
+
+        cd {{.ITEM}}
+        t=$(date +"%Y-%m-%d-%T")
+        mkdir -p reports
+        go mod tidy
+        echo "[INFO] Generating coverage report"
+        go test ./tests/... -coverpkg=./... -coverprofile=./reports/coverage_${t}.out
+        go tool cover -func=reports/coverage_${t}.out
+
+  all:
+    desc: Run test > converge > build
+    deps:
+    - clean
+    cmds:
+    - task: test
+    - task: coverage
+    - task: build
