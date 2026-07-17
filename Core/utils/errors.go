@@ -5,8 +5,8 @@ import "fmt"
 type ErrorCode string
 
 type AppError struct {
-	Code    ErrorCode `json:"app_error_code"`
-	Message string    `json:"app_error_message"`
+	Code    ErrorCode `json:"error_code"`
+	Message string    `json:"error_message"`
 	Err     error     `json:"-"`
 }
 
