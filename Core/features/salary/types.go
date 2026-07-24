@@ -23,10 +23,10 @@ type Salary struct {
 	WorkHoursPerDay float64      `json:"work_hours_per_day"`
 	WorkDaysPerWeek int8         `json:"work_days_per_week"`
 	IncomeType      IncomeType   `json:"income_type"`
-	Earnings        timeEarnings `json:"earnings"`
+	Earnings        TimeEarnings `json:"earnings"`
 }
 
-type timeEarnings struct {
+type TimeEarnings struct {
 	Hourly  float64 `json:"hourly"`
 	Daily   float64 `json:"daily"`
 	Weekly  float64 `json:"weekly"`
@@ -82,7 +82,7 @@ func (s *Salary) SetIncomeType(incomeType IncomeType) {
 }
 func (s *Salary) SetCurrency(currency string) *utils.AppError {
 	if s.AnnualIncome <= 0 && currency == "" {
-		return utils.NewAppError(NoCurrency, "no currency declared for annual income", nil)
+		return utils.NewAppError(NoCurrency, "No currency declared for annual income", nil)
 	}
 	s.Currency = currency
 	return nil
@@ -90,7 +90,7 @@ func (s *Salary) SetCurrency(currency string) *utils.AppError {
 
 func (s *Salary) refreshEarnings() {
 	if s.AnnualIncome <= 0 {
-		s.Earnings = timeEarnings{}
+		s.Earnings = TimeEarnings{}
 		return
 	}
 
@@ -99,7 +99,7 @@ func (s *Salary) refreshEarnings() {
 	dailySalary := utils.RoundToTwoDecimal(weeklySalary / float64(s.WorkDaysPerWeek))
 	hourlySalary := utils.RoundToTwoDecimal(dailySalary / s.WorkHoursPerDay)
 
-	s.Earnings = timeEarnings{
+	s.Earnings = TimeEarnings{
 		Monthly: monthlySalary,
 		Weekly:  weeklySalary,
 		Daily:   dailySalary,

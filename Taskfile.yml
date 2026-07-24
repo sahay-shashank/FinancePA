@@ -3,47 +3,67 @@ version: 3
 silent: true
 
 vars:
-  DIRS: ["Core"]
+  GO_DIRS: ["Core"]
 
 tasks:
   test:
     desc: Run tests
     summary: |
-      Run every tests listed under "test" directory
+      Run Go tests for each top-level Core package directory
     cmds:
-    - for:
-        var: DIRS
-      cmd: |
-        set -eou pipefail
+      - for:
+          var: GO_DIRS
+        cmd: |
+          set -eou pipefail
 
-        cd {{.ITEM}}
-        go mod tidy
-        echo "[INFO] Testing test cases listed under \"test/\""
-        go test ./tests/... -v
+          cd {{.ITEM}}
+          go mod tidy
+
+          while IFS= read -r dir; do
+            [ -z "$dir" ] && continue
+            [ "$dir" = "reports" ] && continue
+
+            echo "[INFO] Testing ./$dir/..."
+            go test "./$dir/..." -v
+            awk -v n="${COLUMNS:-80}" 'BEGIN{for(i=0;i<n;i++) printf "-"; print ""}'
+          done < <(find . -mindepth 1 -maxdepth 1 -type d ! -name '.*' | sed 's#^./##' | sort)
 
   coverage:
     desc: Test coverage report
     summary: |
-      Generate go test coverage report
+      Generate detailed Go test coverage reports for each top-level Core folder
     cmds:
-    - for:
-        var: DIRS
-      cmd: |
-        set -eou pipefail
+      - for:
+          var: GO_DIRS
+        cmd: |
+          set -eou pipefail
 
-        cd {{.ITEM}}
-        t=$(date +"%Y-%m-%d-%T")
-        mkdir -p reports
-        go mod tidy
-        echo "[INFO] Generating coverage report"
-        go test ./tests/... -coverpkg=./... -coverprofile=./reports/coverage_${t}.out
-        go tool cover -func=reports/coverage_${t}.out
+          cd {{.ITEM}}
+          t=$(date +"%Y-%m-%d-%T")
+          mkdir -p reports
+          go mod tidy
 
-  all:
-    desc: Run test > converge > build
-    deps:
-    - clean
-    cmds:
-    - task: test
-    - task: coverage
-    - task: build
+          while IFS= read -r dir; do
+            [ -z "$dir" ] && continue
+            [ "$dir" = "reports" ] && continue
+
+            case "$dir" in
+              features)
+                pkgs="./features/..."
+                coverpkg="./features/..."
+                ;;
+              utils)
+                pkgs="./utils/..."
+                coverpkg="./utils/..."
+                ;;
+              *)
+                continue
+                ;;
+            esac
+
+            mkdir -p "reports/$dir"
+            echo "[INFO] Generating coverage report for $dir"
+            go test $pkgs -coverpkg="$coverpkg" -coverprofile="./reports/$dir/coverage_${t}.out"
+            go tool cover -func="./reports/$dir/coverage_${t}.out" > "./reports/$dir/coverage_${t}.txt"
+          done < <(find . -mindepth 1 -maxdepth 1 -type d ! -name '.*' | sed 's#^./##' | sort)
+

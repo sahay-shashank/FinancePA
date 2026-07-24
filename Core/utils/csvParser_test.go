@@ -4,8 +4,6 @@ import (
 	"errors"
 	"strings"
 	"testing"
-
-	"FinancePA/core/utils"
 )
 
 // TestParseFromCSV ensures parsing goes as expected by perfomring parsing over different flavours of CSV.
@@ -16,7 +14,7 @@ func TestParseFromCSV(t *testing.T) {
 		expectedRows int
 		expectedCols int
 		expectError  bool
-		expectedCode utils.ErrorCode
+		expectedCode ErrorCode
 	}{
 		{
 			name:         "Success: Valid standard financial statement records",
@@ -36,7 +34,7 @@ func TestParseFromCSV(t *testing.T) {
 			name:         "Failure: Malformed syntax quotes trigger parse error",
 			csvData:      `2026-07-16,"Broken quote token parsing,Groceries`,
 			expectError:  true,
-			expectedCode: utils.CSVParseError,
+			expectedCode: CSVParseError,
 		},
 	}
 
@@ -44,14 +42,14 @@ func TestParseFromCSV(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			reader := strings.NewReader(tt.csvData)
 
-			records, err := utils.ParseFromCSV(reader)
+			records, err := ParseFromCSV(reader)
 
 			if tt.expectError {
 				if err == nil {
 					t.Fatalf("FAIL [%s]: Expected a parser engine crash, but received zero errors.", tt.name)
 				}
 
-				var appErr *utils.AppError
+				var appErr *AppError
 				if errors.As(err, &appErr) {
 					if appErr.Code != tt.expectedCode {
 						t.Errorf("FAIL [%s]: Error signature mismatch.\nExpected Code: %s\nActual Code:   %s", tt.name, tt.expectedCode, appErr.Code)

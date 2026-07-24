@@ -1,13 +1,11 @@
-package salary_test
+package salary
 
 import (
 	"testing"
-
-	"FinancePA/core/features/salary"
 )
 
 func TestNewSalaryNormalizesInvalidWorkSchedule(t *testing.T) {
-	got, err := salary.NewSalary(120000, "INR", 0, 0, salary.IncomeTypeSalaried)
+	got, err := NewSalary(120000, "INR", 0, 0, IncomeTypeSalaried)
 
 	if err != nil {
 		t.Fatal("error creating salary object")

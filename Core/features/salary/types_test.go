@@ -1,9 +1,7 @@
-package salary_test
+package salary
 
 import (
 	"testing"
-
-	"FinancePA/core/features/salary"
 )
 
 func TestNewSalaryInitializesEarningsForAllIncomeTypes(t *testing.T) {
@@ -13,8 +11,8 @@ func TestNewSalaryInitializesEarningsForAllIncomeTypes(t *testing.T) {
 		currency        string
 		workHoursPerDay float64
 		workDaysPerWeek int8
-		incomeType      salary.IncomeType
-		wantType        salary.IncomeType
+		incomeType      IncomeType
+		wantType        IncomeType
 		wantMonthly     float64
 		wantWeekly      float64
 		wantDaily       float64
@@ -27,7 +25,7 @@ func TestNewSalaryInitializesEarningsForAllIncomeTypes(t *testing.T) {
 			workHoursPerDay: 8,
 			workDaysPerWeek: 5,
 			incomeType:      "",
-			wantType:        salary.IncomeTypeSalaried,
+			wantType:        IncomeTypeSalaried,
 			wantMonthly:     10000,
 			wantWeekly:      2307.69,
 			wantDaily:       461.54,
@@ -39,8 +37,8 @@ func TestNewSalaryInitializesEarningsForAllIncomeTypes(t *testing.T) {
 			currency:        "INR",
 			workHoursPerDay: 8,
 			workDaysPerWeek: 5,
-			incomeType:      salary.IncomeTypeSalaried,
-			wantType:        salary.IncomeTypeSalaried,
+			incomeType:      IncomeTypeSalaried,
+			wantType:        IncomeTypeSalaried,
 			wantMonthly:     10000,
 			wantWeekly:      2307.69,
 			wantDaily:       461.54,
@@ -52,8 +50,8 @@ func TestNewSalaryInitializesEarningsForAllIncomeTypes(t *testing.T) {
 			currency:        "USD",
 			workHoursPerDay: 6,
 			workDaysPerWeek: 5,
-			incomeType:      salary.IncomeTypeFreelancer,
-			wantType:        salary.IncomeTypeFreelancer,
+			incomeType:      IncomeTypeFreelancer,
+			wantType:        IncomeTypeFreelancer,
 			wantMonthly:     6250,
 			wantWeekly:      1442.31,
 			wantDaily:       288.46,
@@ -65,8 +63,8 @@ func TestNewSalaryInitializesEarningsForAllIncomeTypes(t *testing.T) {
 			currency:        "EUR",
 			workHoursPerDay: 10,
 			workDaysPerWeek: 6,
-			incomeType:      salary.IncomeTypeBusiness,
-			wantType:        salary.IncomeTypeBusiness,
+			incomeType:      IncomeTypeBusiness,
+			wantType:        IncomeTypeBusiness,
 			wantMonthly:     15000,
 			wantWeekly:      3461.54,
 			wantDaily:       576.92,
@@ -76,7 +74,7 @@ func TestNewSalaryInitializesEarningsForAllIncomeTypes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := salary.NewSalary(tt.annualIncome, tt.currency, tt.workHoursPerDay, tt.workDaysPerWeek, tt.incomeType)
+			got, err := NewSalary(tt.annualIncome, tt.currency, tt.workHoursPerDay, tt.workDaysPerWeek, tt.incomeType)
 			if err != nil {
 				t.Fatalf("expected no error, got %v", err)
 			}
@@ -94,7 +92,7 @@ func TestNewSalaryInitializesEarningsForAllIncomeTypes(t *testing.T) {
 }
 
 func TestNewSalaryReturnsEmptyEarningsForNonPositiveIncome(t *testing.T) {
-	got, err := salary.NewSalary(0, "INR", 8, 5, salary.IncomeTypeFreelancer)
+	got, err := NewSalary(0, "INR", 8, 5, IncomeTypeFreelancer)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -103,8 +101,8 @@ func TestNewSalaryReturnsEmptyEarningsForNonPositiveIncome(t *testing.T) {
 		t.Fatalf("expected annual income 0, got %.2f", got.AnnualIncome)
 	}
 
-	if got.IncomeType != salary.IncomeTypeFreelancer {
-		t.Fatalf("expected income type %q, got %q", salary.IncomeTypeFreelancer, got.IncomeType)
+	if got.IncomeType != IncomeTypeFreelancer {
+		t.Fatalf("expected income type %q, got %q", IncomeTypeFreelancer, got.IncomeType)
 	}
 
 	if got.Earnings.Monthly != 0 || got.Earnings.Weekly != 0 || got.Earnings.Daily != 0 || got.Earnings.Hourly != 0 {
@@ -113,7 +111,7 @@ func TestNewSalaryReturnsEmptyEarningsForNonPositiveIncome(t *testing.T) {
 }
 
 func TestNewSalaryReturnsErrorWhenCurrencyIsMissing(t *testing.T) {
-	got, err := salary.NewSalary(120000, "", 8, 5, salary.IncomeTypeSalaried)
+	got, err := NewSalary(120000, "", 8, 5, IncomeTypeSalaried)
 	if err == nil {
 		t.Fatal("expected an error when currency is missing")
 	}
@@ -124,7 +122,7 @@ func TestNewSalaryReturnsErrorWhenCurrencyIsMissing(t *testing.T) {
 }
 
 func TestSalaryMutatorsRecalculateEarnings(t *testing.T) {
-	got, err := salary.NewSalary(120000, "INR", 8, 5, salary.IncomeTypeSalaried)
+	got, err := NewSalary(120000, "INR", 8, 5, IncomeTypeSalaried)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -141,14 +139,14 @@ func TestSalaryMutatorsRecalculateEarnings(t *testing.T) {
 }
 
 func TestSalaryMutatorsUpdateIncomeTypeAndCurrency(t *testing.T) {
-	got, err := salary.NewSalary(120000, "INR", 8, 5, salary.IncomeTypeSalaried)
+	got, err := NewSalary(120000, "INR", 8, 5, IncomeTypeSalaried)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
 
-	got.SetIncomeType(salary.IncomeTypeFreelancer)
-	if got.IncomeType != salary.IncomeTypeFreelancer {
-		t.Fatalf("expected income type %q, got %q", salary.IncomeTypeFreelancer, got.IncomeType)
+	got.SetIncomeType(IncomeTypeFreelancer)
+	if got.IncomeType != IncomeTypeFreelancer {
+		t.Fatalf("expected income type %q, got %q", IncomeTypeFreelancer, got.IncomeType)
 	}
 
 	if err := got.SetCurrency("USD"); err != nil {
@@ -161,7 +159,7 @@ func TestSalaryMutatorsUpdateIncomeTypeAndCurrency(t *testing.T) {
 }
 
 func TestSalarySetCurrencyRejectsEmptyCurrencyForZeroIncome(t *testing.T) {
-	got := &salary.Salary{}
+	got := &Salary{}
 
 	err := got.SetCurrency("")
 	if err == nil {
@@ -170,7 +168,7 @@ func TestSalarySetCurrencyRejectsEmptyCurrencyForZeroIncome(t *testing.T) {
 }
 
 func TestSalaryMutatorResetsEarningsForZeroIncome(t *testing.T) {
-	got, err := salary.NewSalary(120000, "INR", 8, 5, salary.IncomeTypeSalaried)
+	got, err := NewSalary(120000, "INR", 8, 5, IncomeTypeSalaried)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}

@@ -1,27 +1,26 @@
-package utils_test
+package utils
 
 import (
-	"FinancePA/core/utils"
 	"errors"
 	"testing"
 )
 
 const (
-	ErrInternalError    utils.ErrorCode = "INTERNAL_SERVER_ERROR"
-	ErrTelemetryFailure utils.ErrorCode = "ERROR_TELEMETRY_FAILURE"
-	ErrInvalidCSV       utils.ErrorCode = "ERROR_INVALID_CSV"
+	ErrInternalError    ErrorCode = "INTERNAL_SERVER_ERROR"
+	ErrTelemetryFailure ErrorCode = "ERROR_TELEMETRY_FAILURE"
+	ErrInvalidCSV       ErrorCode = "ERROR_INVALID_CSV"
 )
 
 // TestAppErrorFormatting uses Table-Driven Testing to validate error serialization
 func TestAppErrorFormatting(t *testing.T) {
 	tests := []struct {
 		name           string
-		inputError     *utils.AppError
+		inputError     *AppError
 		expectedString string
 	}{
 		{
 			name: "Simple error without underlying system error",
-			inputError: &utils.AppError{
+			inputError: &AppError{
 				Code:    ErrInvalidCSV,
 				Message: "Missing columns",
 				Err:     nil,
@@ -30,7 +29,7 @@ func TestAppErrorFormatting(t *testing.T) {
 		},
 		{
 			name: "Complex error wrapping an underlying OS/DB failure",
-			inputError: &utils.AppError{
+			inputError: &AppError{
 				Code:    ErrTelemetryFailure,
 				Message: "Network timed out for prometheus",
 				Err:     errors.New("connection refused on port 9090"),
@@ -53,7 +52,7 @@ func TestAppErrorFormatting(t *testing.T) {
 // TestAppErrorUnwrapping ensures our custom error can be unwrapped via standard Go tools
 func TestAppErrorUnwrapping(t *testing.T) {
 	underlyingOS := errors.New("disk full")
-	customAppErr := utils.NewAppError(ErrInternalError, "Failed to write dump block", underlyingOS)
+	customAppErr := NewAppError(ErrInternalError, "Failed to write dump block", underlyingOS)
 
 	if !errors.Is(customAppErr, underlyingOS) {
 		t.Errorf("FAIL: The underlying system error was lost during AppError wrapping chain.")
