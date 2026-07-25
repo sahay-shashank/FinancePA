@@ -26,6 +26,14 @@ type Salary struct {
 	Earnings        TimeEarnings `json:"earnings"`
 }
 
+type Time struct {
+	Years  int     `json:"years"`
+	Months int     `json:"months"`
+	Weeks  int     `json:"weeks"`
+	Days   int     `json:"days"`
+	Hours  float32 `json:"hours"`
+}
+
 type TimeEarnings struct {
 	Hourly  float64 `json:"hourly"`
 	Daily   float64 `json:"daily"`
