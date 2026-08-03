@@ -5,8 +5,7 @@ FROM mcr.microsoft.com/devcontainers/typescript-node:${VARIANT}
 #
 COPY scripts/*.sh /tmp/scripts/
 
-## Install taskfile
+## Install dependencies
 #
-RUN echo "$(go env GOOS)"
-RUN echo "$(go env GOARCH)"
 RUN bash /tmp/scripts/install_dependencies.sh
+RUN bash /tmp/scripts/post-install.sh

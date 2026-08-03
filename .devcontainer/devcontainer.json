@@ -1,25 +1,38 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
 	"name": "FinancePA-devcontainer",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"features": {
-		"ghcr.io/devcontainers/features/go:1": {}
-	},
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": {
 			"VARIANT": "4-24-trixie"
 		}
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/go:1": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"moby": false,
+			"dockerDefaultAddressPool": "base=172.30.0.0/16,size=24"
+		},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"upgradePackages": true
+		}
+	},
+	"runArgs": [
+		"--privileged",
+		"--init"
+	],
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash"
+			},
+			"extensions": [
+				"ms-kubernetes-tools.vscode-kubernetes-tools",
+				"ms-azuretools.vscode-docker"
+			]
+		}
+	},
+	"remoteEnv": {
+		"GO111MODULE": "on"
 	}
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "yarn install",
-	// Configure tool-specific properties.
-	// "customizations": {},
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
 }
